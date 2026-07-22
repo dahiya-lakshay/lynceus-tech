@@ -14,6 +14,7 @@ Two entry points:
 Both paths share `_engineer_features`, so training and inference can never
 silently drift apart.
 """
+
 import joblib
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -40,8 +41,12 @@ def _add_contextual_features(df: pd.DataFrame) -> pd.DataFrame:
     no history lookup required."""
     df["HourOfDay"] = df["TransactionDate"].dt.hour.fillna(12).astype(int)
     df["IsNight"] = df["HourOfDay"].apply(lambda h: 1 if (h >= 22 or h <= 5) else 0)
-    df["IsWeekend"] = df["TransactionDate"].dt.dayofweek.fillna(0).apply(lambda d: 1 if d >= 5 else 0)
-    df["AmountToBalanceRatio"] = df["TransactionAmount"] / (df["AccountBalance"].fillna(0) + 1.0)
+    df["IsWeekend"] = (
+        df["TransactionDate"].dt.dayofweek.fillna(0).apply(lambda d: 1 if d >= 5 else 0)
+    )
+    df["AmountToBalanceRatio"] = df["TransactionAmount"] / (
+        df["AccountBalance"].fillna(0) + 1.0
+    )
     df["HighLoginAttempts"] = (df["LoginAttempts"] >= 3).astype(int)
     return df
 
@@ -52,7 +57,10 @@ def _add_behavioral_features(df: pd.DataFrame) -> pd.DataFrame:
     strings and raw (unscaled) TransactionAmount to compare against profiles."""
     records = df.apply(
         lambda row: account_profile.behavioral_features(
-            row["AccountID"], row["TransactionAmount"], str(row["DeviceID"]), str(row["Location"])
+            row["AccountID"],
+            row["TransactionAmount"],
+            str(row["DeviceID"]),
+            str(row["Location"]),
         ),
         axis=1,
         result_type="expand",
@@ -137,7 +145,11 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
         # Unseen categories at inference time fall back to the encoder's
         # first known class rather than crashing the request.
         known = set(encoder.classes_)
-        df[col] = df[col].astype(str).apply(lambda v: v if v in known else encoder.classes_[0])
+        df[col] = (
+            df[col]
+            .astype(str)
+            .apply(lambda v: v if v in known else encoder.classes_[0])
+        )
         df[col] = encoder.transform(df[col])
 
     return df

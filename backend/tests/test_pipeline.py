@@ -4,6 +4,7 @@ been run so model artifacts exist under backend/models/ — that's true in CI
 (see .github/workflows/backend-ci.yml, which trains before testing) and true
 in this repo out of the box, since trained artifacts ship with it.
 """
+
 import pandas as pd
 import pytest
 
@@ -35,8 +36,15 @@ def test_transform_produces_expected_engineered_columns():
     df = pd.DataFrame([SAMPLE_TRANSACTION])
     processed = transform(df)
 
-    for col in ("HourOfDay", "IsNight", "IsWeekend", "AmountToBalanceRatio",
-                "AccountAmountZScore", "IsNewDeviceForAccount", "IsNewLocationForAccount"):
+    for col in (
+        "HourOfDay",
+        "IsNight",
+        "IsWeekend",
+        "AmountToBalanceRatio",
+        "AccountAmountZScore",
+        "IsNewDeviceForAccount",
+        "IsNewLocationForAccount",
+    ):
         assert col in processed.columns, f"missing engineered feature: {col}"
 
 
@@ -58,20 +66,32 @@ def test_unknown_account_falls_back_to_global_profile():
 
 
 def test_rules_engine_flags_excessive_login_attempts():
-    behavioral = {"IsNewDeviceForAccount": False, "IsNewLocationForAccount": False, "AccountAmountZScore": 0}
+    behavioral = {
+        "IsNewDeviceForAccount": False,
+        "IsNewLocationForAccount": False,
+        "AccountAmountZScore": 0,
+    }
     txn = {**SAMPLE_TRANSACTION, "LoginAttempts": 6}
     flags = evaluate_rules(txn, behavioral)
     assert any(f["rule"] == "EXCESSIVE_LOGIN_ATTEMPTS" for f in flags)
 
 
 def test_rules_engine_flags_amount_exceeding_balance():
-    behavioral = {"IsNewDeviceForAccount": False, "IsNewLocationForAccount": False, "AccountAmountZScore": 0}
+    behavioral = {
+        "IsNewDeviceForAccount": False,
+        "IsNewLocationForAccount": False,
+        "AccountAmountZScore": 0,
+    }
     txn = {**SAMPLE_TRANSACTION, "TransactionAmount": 5000.0, "AccountBalance": 100.0}
     flags = evaluate_rules(txn, behavioral)
     assert any(f["rule"] == "AMOUNT_EXCEEDS_3X_BALANCE" for f in flags)
 
 
 def test_rules_engine_clean_transaction_has_no_high_severity_flags():
-    behavioral = {"IsNewDeviceForAccount": False, "IsNewLocationForAccount": False, "AccountAmountZScore": 0.2}
+    behavioral = {
+        "IsNewDeviceForAccount": False,
+        "IsNewLocationForAccount": False,
+        "AccountAmountZScore": 0.2,
+    }
     flags = evaluate_rules(SAMPLE_TRANSACTION, behavioral)
     assert not any(f["severity"] == "high" for f in flags)

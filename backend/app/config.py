@@ -5,6 +5,7 @@ Every path here is resolved relative to the backend package root, so the
 app runs the same whether it's launched from the repo root, a Docker
 container, or Render's build environment.
 """
+
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,15 +46,22 @@ CATEGORICAL_COLS = [
     "CustomerOccupation",
 ]
 
+
 def encoder_path(col: str) -> str:
     return os.path.join(MODELS_DIR, f"{col}_encoder.pkl")
 
-NUMERIC_COLS = ["TransactionAmount", "CustomerAge", "TransactionDuration", "AccountBalance"]
+
+NUMERIC_COLS = [
+    "TransactionAmount",
+    "CustomerAge",
+    "TransactionDuration",
+    "AccountBalance",
+]
 
 ID_COLS = ["TransactionID", "AccountID"]
 DATE_COLS = ["TransactionDate", "PreviousTransactionDate"]
 
 RANDOM_STATE = 42
-CONTAMINATION = 0.05      # expected proportion of anomalous transactions
+CONTAMINATION = 0.05  # expected proportion of anomalous transactions
 TEST_SIZE = 0.2
 KFOLD_SPLITS = 5

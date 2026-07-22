@@ -6,6 +6,7 @@ human staring at a notebook. This version returns plain JSON — a ranked
 list of {feature, shap_value, direction} per prediction — so the React
 frontend can render its own chart and the API stays framework-agnostic.
 """
+
 import json
 
 import joblib
@@ -49,12 +50,14 @@ def explain_prediction(model, row_df: pd.DataFrame, top_n: int = 8) -> list[dict
 
     explanations = []
     for feature, value in ranked:
-        explanations.append({
-            "feature": feature,
-            "shap_value": round(float(value), 5),
-            "direction": "increased" if value > 0 else "decreased",
-            "magnitude": round(float(abs(value)), 5),
-        })
+        explanations.append(
+            {
+                "feature": feature,
+                "shap_value": round(float(value), 5),
+                "direction": "increased" if value > 0 else "decreased",
+                "magnitude": round(float(abs(value)), 5),
+            }
+        )
     return explanations
 
 

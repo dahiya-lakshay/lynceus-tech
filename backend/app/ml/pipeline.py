@@ -10,6 +10,7 @@ Takes a raw transaction and returns:
   - a tree-vote confidence score, where available
   - any deterministic rule flags triggered alongside the ML decision
 """
+
 import json
 
 import joblib
@@ -84,7 +85,9 @@ def score_transaction(raw_transaction: dict) -> dict:
         "AccountAmountZScore": float(processed["AccountAmountZScore"].iloc[0]),
         "IsNewDeviceForAccount": bool(processed["IsNewDeviceForAccount"].iloc[0]),
         "IsNewLocationForAccount": bool(processed["IsNewLocationForAccount"].iloc[0]),
-        "AccountHistoricalTxnCount": int(processed["AccountHistoricalTxnCount"].iloc[0]),
+        "AccountHistoricalTxnCount": int(
+            processed["AccountHistoricalTxnCount"].iloc[0]
+        ),
     }
     rule_flags = evaluate_rules(raw_transaction, behavioral)
 

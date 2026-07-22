@@ -8,9 +8,9 @@ from app.api import routes_predict, routes_stats, routes_stream
 app = FastAPI(
     title="Lynceus API",
     description="Real-time financial transaction fraud detection: Isolation Forest anomaly "
-                "scoring, a Random Forest / Histogram Gradient Boosting leaderboard trained on "
-                "the anomaly signal, a per-account behavioral feature store, a deterministic "
-                "rules engine, and SHAP-based explanations for every prediction.",
+    "scoring, a Random Forest / Histogram Gradient Boosting leaderboard trained on "
+    "the anomaly signal, a per-account behavioral feature store, a deterministic "
+    "rules engine, and SHAP-based explanations for every prediction.",
     version="2.0.0",
 )
 
@@ -36,5 +36,11 @@ def root():
         "service": "Lynceus API",
         "tagline": "Sees what others miss.",
         "docs": "/docs",
-        "endpoints": ["/api/predict", "/api/stats", "/api/stream/recent", "/api/stream/next", "/api/health"],
+        "endpoints": [
+            "/api/predict",
+            "/api/stats",
+            "/api/stream/recent",
+            "/api/stream/next",
+            "/api/health",
+        ],
     }

@@ -18,4 +18,6 @@ def predict(transaction: TransactionInput):
             detail="Model artifacts not found. Run the training pipeline first (python -m app.ml.train).",
         )
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Could not score transaction: {exc}")
+        raise HTTPException(
+            status_code=400, detail=f"Could not score transaction: {exc}"
+        )

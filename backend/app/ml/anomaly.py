@@ -9,6 +9,7 @@ classifier learns to generalize the anomaly detector's judgment rather than
 just memorize it, which is what makes single-transaction scoring at
 inference time meaningful.
 """
+
 import joblib
 import pandas as pd
 from sklearn.ensemble import IsolationForest
@@ -55,8 +56,10 @@ def fit_anomaly_detector(df: pd.DataFrame) -> pd.DataFrame:
     flagged.to_csv(FLAGGED_TRANSACTIONS_PATH, index=False)
     df.to_csv(AUGMENTED_DATASET_PATH, index=False)
 
-    print(f"[INFO] Isolation Forest flagged {len(flagged)} / {len(df)} transactions "
-          f"({len(flagged) / len(df):.1%}) for the classifier to learn from.")
+    print(
+        f"[INFO] Isolation Forest flagged {len(flagged)} / {len(df)} transactions "
+        f"({len(flagged) / len(df):.1%}) for the classifier to learn from."
+    )
     return df
 
 

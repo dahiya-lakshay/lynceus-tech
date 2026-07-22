@@ -13,6 +13,7 @@ contract is identical: write once from batch history, read once per request.
 Cold start (an AccountID never seen during training) falls back to global
 population statistics rather than failing the request.
 """
+
 import joblib
 import pandas as pd
 
@@ -63,7 +64,9 @@ def get_profile(account_id: str) -> dict:
     return profiles.get(account_id, global_profile)
 
 
-def behavioral_features(account_id: str, amount: float, device_id: str, location: str) -> dict:
+def behavioral_features(
+    account_id: str, amount: float, device_id: str, location: str
+) -> dict:
     profile = get_profile(account_id)
     std = profile["std_amount"] if profile["std_amount"] > 0 else 1.0
 

@@ -13,6 +13,7 @@ Two data sources, seamlessly merged:
    the feed reflect a genuine event-driven pipeline instead of scoring
    on-request.
 """
+
 import json
 import random
 from datetime import datetime, timezone
@@ -23,12 +24,12 @@ from fastapi import APIRouter
 from app.config import LIVE_STREAM_PATH, DATA_PATH
 from app.ml.pipeline import score_transaction
 
-
 router = APIRouter(prefix="/api/stream", tags=["stream"])
 
 _sample_cache = {}
 
 _stream_state = {"index": 0}
+
 
 def _get_sample_pool():
     if "df" not in _sample_cache:
@@ -46,6 +47,7 @@ def _simulate_one():
         "scored_at": datetime.now(timezone.utc).isoformat(),
         "source": "on_demand",
     }
+
 
 @router.get("/recent")
 def recent(limit: int = 15):
@@ -65,6 +67,7 @@ def recent(limit: int = 15):
     # frontend still has something to show.
     items = [_simulate_one() for _ in range(min(limit, 6))]
     return {"items": items, "mode": "simulated"}
+
 
 @router.get("/next")
 def next_transaction():

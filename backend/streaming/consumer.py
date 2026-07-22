@@ -16,6 +16,7 @@ Env:  KAFKA_BOOTSTRAP_SERVERS (default localhost:9092)
       RAW_TOPIC (default lynceus.transactions.raw)
       SCORED_TOPIC (default lynceus.transactions.scored)
 """
+
 import json
 import os
 from collections import deque
@@ -57,13 +58,17 @@ def main():
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
     )
 
-    print(f"[consumer] Listening on '{RAW_TOPIC}', scoring, publishing to '{SCORED_TOPIC}'.")
+    print(
+        f"[consumer] Listening on '{RAW_TOPIC}', scoring, publishing to '{SCORED_TOPIC}'."
+    )
     for message in consumer:
         transaction = message.value
         try:
             result = score_transaction(transaction)
         except Exception as exc:
-            print(f"[consumer] Failed to score {transaction.get('TransactionID')}: {exc}")
+            print(
+                f"[consumer] Failed to score {transaction.get('TransactionID')}: {exc}"
+            )
             continue
 
         record = {
@@ -77,8 +82,10 @@ def main():
         _append_rolling(record)
 
         verdict = "FRAUD" if result["is_fraud"] else "clear"
-        print(f"[consumer] {transaction.get('TransactionID')} -> {verdict} "
-              f"(p={result['fraud_probability']:.3f})")
+        print(
+            f"[consumer] {transaction.get('TransactionID')} -> {verdict} "
+            f"(p={result['fraud_probability']:.3f})"
+        )
 
 
 if __name__ == "__main__":

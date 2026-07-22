@@ -9,6 +9,7 @@ Env:  KAFKA_BOOTSTRAP_SERVERS (default localhost:9092)
       PRODUCE_INTERVAL_SECONDS (default 2.0)
       RAW_TOPIC (default lynceus.transactions.raw)
 """
+
 import json
 import os
 import time
@@ -32,8 +33,10 @@ def main():
     )
 
     df = pd.read_csv(DATA_PATH)
-    print(f"[producer] Loaded {len(df)} candidate transactions. "
-          f"Publishing to '{RAW_TOPIC}' every {INTERVAL}s.")
+    print(
+        f"[producer] Loaded {len(df)} candidate transactions. "
+        f"Publishing to '{RAW_TOPIC}' every {INTERVAL}s."
+    )
 
     i = 0
     while True:
@@ -41,8 +44,10 @@ def main():
         producer.send(RAW_TOPIC, value=row)
         producer.flush()
         i += 1
-        print(f"[producer] #{i} published {row.get('TransactionID')} "
-              f"(${row.get('TransactionAmount')}, {row.get('Location')})")
+        print(
+            f"[producer] #{i} published {row.get('TransactionID')} "
+            f"(${row.get('TransactionAmount')}, {row.get('Location')})"
+        )
         time.sleep(INTERVAL)
 
 

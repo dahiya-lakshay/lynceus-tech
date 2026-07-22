@@ -16,6 +16,7 @@ Two upgrades over a single fixed model:
    computed and persisted, so the classifier's binary decision reflects an
    actual optimization rather than an arbitrary constant.
 """
+
 import json
 
 import joblib
@@ -73,7 +74,9 @@ def _feature_frame(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _cross_validate(model_fn, X, y):
-    kfold = StratifiedKFold(n_splits=KFOLD_SPLITS, shuffle=True, random_state=RANDOM_STATE)
+    kfold = StratifiedKFold(
+        n_splits=KFOLD_SPLITS, shuffle=True, random_state=RANDOM_STATE
+    )
     fold_metrics = []
     for fold, (train_idx, test_idx) in enumerate(kfold.split(X, y), start=1):
         X_tr, X_te = X.iloc[train_idx], X.iloc[test_idx]
@@ -84,16 +87,20 @@ def _cross_validate(model_fn, X, y):
         pred = clf.predict(X_te)
         proba = clf.predict_proba(X_te)[:, 1]
 
-        fold_metrics.append({
-            "fold": fold,
-            "precision": precision_score(y_te, pred, zero_division=0),
-            "recall": recall_score(y_te, pred, zero_division=0),
-            "f1": f1_score(y_te, pred, zero_division=0),
-            "roc_auc": roc_auc_score(y_te, proba),
-        })
+        fold_metrics.append(
+            {
+                "fold": fold,
+                "precision": precision_score(y_te, pred, zero_division=0),
+                "recall": recall_score(y_te, pred, zero_division=0),
+                "f1": f1_score(y_te, pred, zero_division=0),
+                "roc_auc": roc_auc_score(y_te, proba),
+            }
+        )
 
-    avg = {k: sum(m[k] for m in fold_metrics) / len(fold_metrics)
-           for k in ("precision", "recall", "f1", "roc_auc")}
+    avg = {
+        k: sum(m[k] for m in fold_metrics) / len(fold_metrics)
+        for k in ("precision", "recall", "f1", "roc_auc")
+    }
     return fold_metrics, avg
 
 
@@ -143,7 +150,9 @@ def train_classifier(df: pd.DataFrame):
     pr_curve_points = [
         {"threshold": float(t), "precision": float(p), "recall": float(r)}
         for t, p, r in zip(thresholds, precisions[:-1], recalls[:-1])
-    ][::max(1, len(thresholds) // 60)]  # thin to ~60 points for the chart
+    ][
+        :: max(1, len(thresholds) // 60)
+    ]  # thin to ~60 points for the chart
     with open(PR_CURVE_PATH, "w") as f:
         json.dump(pr_curve_points, f, indent=2)
 
@@ -158,7 +167,9 @@ def train_classifier(df: pd.DataFrame):
         "fraud_rate_in_test": float(y_test.mean()),
         "decision_threshold": best_threshold,
     }
-    print(f"[INFO] Held-out metrics @ optimized threshold {best_threshold:.3f}: {holdout_metrics}")
+    print(
+        f"[INFO] Held-out metrics @ optimized threshold {best_threshold:.3f}: {holdout_metrics}"
+    )
 
     with open(THRESHOLD_PATH, "w") as f:
         json.dump({"threshold": best_threshold, "model": winner_name}, f)
@@ -167,7 +178,9 @@ def train_classifier(df: pd.DataFrame):
     final_model = CANDIDATE_MODELS[winner_name]()
     final_model.fit(X, y)
     joblib.dump(final_model, CLASSIFIER_MODEL_PATH)
-    print(f"[INFO] Production classifier ({winner_name}) saved at {CLASSIFIER_MODEL_PATH}")
+    print(
+        f"[INFO] Production classifier ({winner_name}) saved at {CLASSIFIER_MODEL_PATH}"
+    )
 
     if hasattr(final_model, "feature_importances_"):
         importances = sorted(
@@ -179,8 +192,14 @@ def train_classifier(df: pd.DataFrame):
         # HistGradientBoostingClassifier has no feature_importances_; fall back
         # to permutation importance on the held-out split for the dashboard.
         from sklearn.inspection import permutation_importance
+
         perm = permutation_importance(
-            holdout_model, X_test, y_test, n_repeats=5, random_state=RANDOM_STATE, scoring="roc_auc"
+            holdout_model,
+            X_test,
+            y_test,
+            n_repeats=5,
+            random_state=RANDOM_STATE,
+            scoring="roc_auc",
         )
         importances = sorted(
             zip(X.columns, perm.importances_mean.tolist()),
@@ -189,7 +208,9 @@ def train_classifier(df: pd.DataFrame):
         )
 
     with open(FEATURE_IMPORTANCE_PATH, "w") as f:
-        json.dump([{"feature": f_, "importance": v} for f_, v in importances], f, indent=2)
+        json.dump(
+            [{"feature": f_, "importance": v} for f_, v in importances], f, indent=2
+        )
 
     metrics = {
         "holdout": holdout_metrics,

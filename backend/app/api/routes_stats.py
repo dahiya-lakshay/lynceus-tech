@@ -30,8 +30,17 @@ def get_dashboard_stats(recent_limit: int = 12):
 
         flagged = pd.read_csv(FLAGGED_TRANSACTIONS_PATH)
         recent_flagged = (
-            flagged[["TransactionID", "AccountID", "TransactionAmount", "TransactionType",
-                     "Location", "Channel", "AnomalyScore"]]
+            flagged[
+                [
+                    "TransactionID",
+                    "AccountID",
+                    "TransactionAmount",
+                    "TransactionType",
+                    "Location",
+                    "Channel",
+                    "AnomalyScore",
+                ]
+            ]
             .sort_values("AnomalyScore")
             .head(recent_limit)
             .to_dict(orient="records")

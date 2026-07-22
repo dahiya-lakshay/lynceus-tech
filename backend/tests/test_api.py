@@ -2,6 +2,7 @@
 API-level smoke tests using FastAPI's TestClient. Requires model artifacts
 to exist (run `python -m app.ml.train` first — CI does this automatically).
 """
+
 from fastapi.testclient import TestClient
 
 from app.main import app
