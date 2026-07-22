@@ -56,13 +56,24 @@ def get_dashboard_stats(recent_limit: int = 12):
             "leaderboard": leaderboard,
             "pr_curve": pr_curve,
         }
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         raise HTTPException(
             status_code=503,
-            detail="Training outputs not found. Run the training pipeline first (python -m app.ml.train).",
+            detail=f"Missing required artifact: {e.filename}",
         )
 
 
+from pathlib import Path
+
 @router.get("/health")
 def health_check():
-    return {"status": "ok"}
+    models_ready = Path("/app/models/fraud_classifier.pkl").exists()
+
+    dashboard_ready = Path("/app/outputs/metrics.json").exists()
+
+    return {
+        "status": "healthy" if models_ready and dashboard_ready else "initializing",
+        "models_ready": models_ready,
+        "dashboard_ready": dashboard_ready,
+        "version": "1.0.0",
+    }

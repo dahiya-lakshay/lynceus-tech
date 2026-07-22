@@ -63,6 +63,12 @@ services:
       - ./backend/outputs:/app/outputs
       - ./backend/models:/app/models
 
+    services:
+      backend:
+        volumes:
+          - ./backend/models:/app/models
+          - ./backend/outputs:/app/outputs
+
   producer:
     build:
       context: ./backend
@@ -118,3 +124,4 @@ services:
     depends_on:
       backend:
         condition: service_started
+
