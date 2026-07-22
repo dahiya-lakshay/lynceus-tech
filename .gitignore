@@ -1,0 +1,63 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# ==========================
+# Environment Variables
+# ==========================
+.env
+.env.*
+
+# ==========================
+# Logs
+# ==========================
+*.log
+
+# ==========================
+# macOS
+# ==========================
+.DS_Store
+
+# ==========================
+# IDEs
+# ==========================
+.vscode/
+.idea/
+
+# ==========================
+# Node
+# ==========================
+frontend/node_modules/
+frontend/dist/
+
+# ==========================
+# Python Build
+# ==========================
+build/
+dist/
+*.egg-info/
+
+# ==========================
+# Outputs / Generated Files
+# ==========================
+backend/outputs/
+backend/static/reports/
+backend/static/exports/
+
+# ==========================
+# Docker
+# ==========================
+*.pid
