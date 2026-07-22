@@ -47,7 +47,6 @@ def _simulate_one():
         "source": "on_demand",
     }
 
-
 @router.get("/recent")
 def recent(limit: int = 15):
     try:
@@ -67,10 +66,8 @@ def recent(limit: int = 15):
     items = [_simulate_one() for _ in range(min(limit, 6))]
     return {"items": items, "mode": "simulated"}
 
-
 @router.get("/next")
 def next_transaction():
-    print(">>>>>>>>>>>> USING KAFKA STREAM ENDPOINT <<<<<<<<<<<<")
     try:
         with open(LIVE_STREAM_PATH) as f:
             lines = f.readlines()
