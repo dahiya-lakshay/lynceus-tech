@@ -1,0 +1,58 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["backend/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint
+        run: flake8 app streaming tests --max-line-length=110 --extend-ignore=E203,W503 --exclude=__pycache__
+
+      - name: Train models
+        # Tests exercise real trained artifacts rather than mocks, so the
+        # model has to exist before pytest runs — same as a fresh clone.
+        run: python -m app.ml.train
+
+      - name: Run tests
+        run: pytest -v
+
+      - name: Build Docker image
+        run: docker build -t lynceus-api:${{ github.sha }} .
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        # Create a Deploy Hook in the Render dashboard for this service and
+        # add its URL as the RENDER_DEPLOY_HOOK_URL repo secret. Render
+        # rebuilds the Docker image (which retrains on build, see
+        # backend/Dockerfile) and redeploys automatically.
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          else
+            echo "RENDER_DEPLOY_HOOK_URL not set — skipping deploy trigger."
+          fi
